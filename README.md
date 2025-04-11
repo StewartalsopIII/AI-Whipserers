@@ -1,15 +1,15 @@
-# Next.js Multilingual Boilerplate
+# AI Whisperers Website
 
-A containerized Next.js boilerplate that's designed to connect easily with backends in multiple languages.
+A terminal-inspired, hacker-chic website for the AI Whisperers community featuring an interactive terminal interface.
 
 ## Features
 
-- 🚀 **Modern Next.js App Router**: Built with the latest Next.js features
-- 🐳 **Docker-Ready**: Fully containerized with multi-stage builds for optimal production images
-- 🔌 **API Integration**: Example API routes showing how to connect to various backends
-- 🌐 **Multilingual Backend Support**: Easy integration with Python, Go, Rust, or any other language
-- 🎨 **Minimal Styling**: Clean, professional UI with Tailwind CSS
-- ⚡ **Performance Focused**: Optimized for speed and efficiency
+- 🧠 **Interactive Terminal Interface**: Command-line style UI with blinking cursor and terminal responses
+- 💬 **Question & Answer Format**: Clickable questions trigger answers displayed in the terminal
+- 🌑 **Dark Mode Default**: Terminal-inspired design with green text on black background
+- 🖥️ **Hacker Aesthetic**: Monospaced fonts, terminal commands, and retro styling
+- 📱 **Fully Responsive**: Optimized layout for all device sizes
+- ⚡ **Next.js + Tailwind**: Built on modern web technologies for performance and maintainability
 
 ## Getting Started
 

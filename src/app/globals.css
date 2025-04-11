@@ -3,18 +3,87 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 10, 10, 10;
-  }
+  --foreground-rgb: 0, 255, 0;
+  --background-rgb: 18, 18, 18;
+  --heading-rgb: 255, 255, 255;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  @apply font-sans;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(to bottom, rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.08) 0%, rgba(18, 18, 18, 0.99) 80%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+main {
+  position: relative;
+  z-index: 10;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: rgb(var(--heading-rgb));
+  @apply font-mono;
+}
+
+@layer components {
+  .terminal-box {
+    @apply bg-black bg-opacity-50 border border-terminal-green p-6 rounded-md font-mono shadow-lg;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.15);
+  }
+  
+  .terminal-prompt {
+    @apply text-terminal-green font-mono;
+  }
+  
+  .terminal-cursor {
+    @apply inline-block w-2 h-4 bg-terminal-green ml-1 align-middle animate-blink;
+  }
+  
+  .terminal-question {
+    @apply text-terminal-green hover:text-terminal-white cursor-pointer transition-all duration-300 font-mono;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .terminal-question {
+      font-size: 0.8rem;
+    }
+  }
+  
+  .animate-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }

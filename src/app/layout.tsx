@@ -1,12 +1,19 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { JetBrains_Mono, Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+});
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter', 
+});
 
 export const metadata: Metadata = {
-  title: 'Next.js Multilingual Boilerplate',
-  description: 'A modern Next.js boilerplate ready for multilingual backends',
+  title: 'AI WHISPERERS',
+  description: 'Helping humans talk to machines — and each other',
 };
 
 export default function RootLayout({
@@ -15,24 +22,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark">
+      <body className={`${jetbrainsMono.variable} ${inter.variable}`}>
         <div className="min-h-screen flex flex-col">
-          <header className="bg-primary-700 text-white p-4">
+          <header className="border-b border-terminal-green/30 p-4">
             <nav className="container mx-auto flex justify-between items-center">
-              <div className="font-bold text-xl">Multilingual Boilerplate</div>
-              <div className="flex space-x-4">
-                <a href="/" className="hover:text-primary-200">Home</a>
-                <a href="/api-example" className="hover:text-primary-200">API Example</a>
+              <div className="font-mono text-terminal-white text-lg">
+                <span className="text-terminal-green">~/</span>
+                <span className="text-terminal-white">ai-whisperers</span>
+              </div>
+              <div className="flex space-x-6">
+                <a href="/" className="font-mono text-terminal-green hover:text-terminal-dimgreen transition-colors duration-200">home</a>
+                <a href="#about" className="font-mono text-terminal-green hover:text-terminal-dimgreen transition-colors duration-200">about</a>
+                <a href="#join" className="font-mono text-terminal-green hover:text-terminal-dimgreen transition-colors duration-200">join</a>
               </div>
             </nav>
           </header>
           <main className="flex-grow container mx-auto p-4">
             {children}
           </main>
-          <footer className="bg-gray-100 p-4 text-center text-gray-600">
-            <div className="container mx-auto">
-              &copy; {new Date().getFullYear()} Next.js Multilingual Boilerplate
+          <footer className="border-t border-terminal-green/30 p-4 text-center text-terminal-gray">
+            <div className="container mx-auto font-mono">
+              <span className="text-terminal-green">$</span> echo "© {new Date().getFullYear()} AI WHISPERERS"
             </div>
           </footer>
         </div>
