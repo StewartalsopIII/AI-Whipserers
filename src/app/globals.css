@@ -76,6 +76,26 @@ h1, h2, h3, h4, h5, h6 {
     .terminal-question {
       font-size: 0.8rem;
     }
+    
+    /* Mobile-specific styles */
+    body {
+      font-size: 14px;
+    }
+    
+    .terminal-box {
+      @apply p-4 shadow-md;
+    }
+    
+    /* Increase contrast for better readability on mobile */
+    .terminal-cursor {
+      @apply w-1.5 h-3.5;
+    }
+    
+    /* Better scrolling behavior on mobile */
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 1rem;
+    }
   }
   
   .animate-in {

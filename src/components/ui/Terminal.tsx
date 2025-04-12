@@ -50,6 +50,20 @@ export function Terminal({ initialPrompt = "$ ask_ai_whisperers --about", questi
           <div className="whitespace-pre-wrap text-sm md:text-base leading-relaxed opacity-90">
             {questions.find(q => q.id === activeAnswer)?.answer}
           </div>
+          <div className="mt-4 pt-3 border-t border-terminal-green border-opacity-30 text-xs text-terminal-gray">
+            <span className="text-terminal-dimgreen">Press any question to continue...</span>
+          </div>
+        </div>
+      )}
+      
+      {!activeAnswer && (
+        <div className="my-4 p-4 bg-black bg-opacity-30 rounded border-l-2 border-terminal-dimgreen border-opacity-40">
+          <div className="terminal-prompt mb-3 text-sm opacity-80">
+            $ echo "Select a question to see the answer here"
+          </div>
+          <div className="text-sm text-terminal-dimgreen opacity-70">
+            {">> The terminal will display responses when you click on a question."}
+          </div>
         </div>
       )}
     </div>

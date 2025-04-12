@@ -3,6 +3,28 @@
 import { Terminal, TerminalQuestion } from '@/components/ui/Terminal';
 import { useEffect, useState, useRef } from 'react';
 
+// Hook to detect if we're on mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Set initial value
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+};
+
 const QUESTIONS = [
   {
     id: 'what-is-this',
@@ -74,70 +96,48 @@ We're trying to create a culture.`
 export default function Home() {
   const [randomPositions, setRandomPositions] = useState<{[key: string]: {top: string, left: string, rotate: string}}>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
+  
+  // Function to scroll to terminal
+  const scrollToTerminal = () => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start'
+      });
+    }
+  };
+  
+  const handleMobileQuestionClick = (id: string) => {
+    setActiveQuestionId(id);
+    // Dispatch the event to the terminal component
+    window.dispatchEvent(
+      new CustomEvent('question-click', { detail: { questionId: id } })
+    );
+    // Scroll to terminal
+    scrollToTerminal();
+  };
   
   useEffect(() => {
     // Generate positions for questions in a circular pattern around the terminal
-    const positions: {[key: string]: {top: string, left: string, rotate: string}} = {};
-    
-    // Responsive radius based on screen size - using much larger values to prevent overlap
-    let radius;
-    if (window.innerWidth < 640) { // Small mobile
-      radius = 280;
-    } else if (window.innerWidth < 768) { // Mobile
-      radius = 350;
-    } else if (window.innerWidth < 1024) { // Tablet
-      radius = 420; 
-    } else { // Desktop
-      radius = 550;
-    }
-    
-    QUESTIONS.forEach((q, i) => {
-      // Split questions to top and bottom sections to avoid overlapping with terminal
-      const isTopSection = i < QUESTIONS.length / 2;
+    // Only needed for desktop view
+    if (!isMobile) {
+      const positions: {[key: string]: {top: string, left: string, rotate: string}} = {};
       
-      // Base angle calculation
-      let angle;
-      if (isTopSection) {
-        // Top half - spread from -45 to -135 degrees (converted to radians)
-        angle = (-45 - (i / (QUESTIONS.length / 2)) * 90) * (Math.PI / 180);
-      } else {
-        // Bottom half - spread from 45 to 135 degrees (converted to radians)
-        const bottomIndex = i - Math.floor(QUESTIONS.length / 2);
-        angle = (45 + (bottomIndex / (QUESTIONS.length - Math.floor(QUESTIONS.length / 2))) * 90) * (Math.PI / 180);
+      // Responsive radius based on screen size - using much larger values to prevent overlap
+      let radius;
+      if (window.innerWidth < 640) { // Small mobile
+        radius = 280;
+      } else if (window.innerWidth < 768) { // Mobile
+        radius = 350;
+      } else if (window.innerWidth < 1024) { // Tablet
+        radius = 420; 
+      } else { // Desktop
+        radius = 550;
       }
       
-      const baseX = Math.sin(angle) * radius;
-      const baseY = Math.cos(angle) * radius;
-      
-      // Add minimal randomness to avoid overlapping the terminal
-      const randomOffsetX = (Math.random() - 0.5) * 30;
-      const randomOffsetY = (Math.random() - 0.5) * 30;
-      const rotate = (Math.random() * 4 - 2).toFixed(1); // -2 to 2 degrees
-      
-      positions[q.id] = {
-        top: `calc(50% + ${baseY + randomOffsetY}px)`,
-        left: `calc(50% + ${baseX + randomOffsetX}px)`,
-        rotate: `${rotate}deg`,
-      };
-    });
-    
-    setRandomPositions(positions);
-    
-    // Update positions on window resize
-    const handleResize = () => {
-      // Recalculate positions when the window is resized
-      let newRadius;
-      if (window.innerWidth < 640) {
-        newRadius = 280;
-      } else if (window.innerWidth < 768) {
-        newRadius = 350;
-      } else if (window.innerWidth < 1024) {
-        newRadius = 420;
-      } else {
-        newRadius = 550;
-      }
-      
-      const newPositions = {...positions};
       QUESTIONS.forEach((q, i) => {
         // Split questions to top and bottom sections to avoid overlapping with terminal
         const isTopSection = i < QUESTIONS.length / 2;
@@ -153,23 +153,119 @@ export default function Home() {
           angle = (45 + (bottomIndex / (QUESTIONS.length - Math.floor(QUESTIONS.length / 2))) * 90) * (Math.PI / 180);
         }
         
-        const baseX = Math.sin(angle) * newRadius;
-        const baseY = Math.cos(angle) * newRadius;
+        const baseX = Math.sin(angle) * radius;
+        const baseY = Math.cos(angle) * radius;
         
-        newPositions[q.id] = {
-          top: `calc(50% + ${baseY}px)`,
-          left: `calc(50% + ${baseX}px)`,
-          rotate: positions[q.id]?.rotate || '0deg',
+        // Add minimal randomness to avoid overlapping the terminal
+        const randomOffsetX = (Math.random() - 0.5) * 30;
+        const randomOffsetY = (Math.random() - 0.5) * 30;
+        const rotate = (Math.random() * 4 - 2).toFixed(1); // -2 to 2 degrees
+        
+        positions[q.id] = {
+          top: `calc(50% + ${baseY + randomOffsetY}px)`,
+          left: `calc(50% + ${baseX + randomOffsetX}px)`,
+          rotate: `${rotate}deg`,
         };
       });
       
-      setRandomPositions(newPositions);
-    };
+      setRandomPositions(positions);
+      
+      // Update positions on window resize
+      const handleResize = () => {
+        // Recalculate positions when the window is resized
+        let newRadius;
+        if (window.innerWidth < 640) {
+          newRadius = 280;
+        } else if (window.innerWidth < 768) {
+          newRadius = 350;
+        } else if (window.innerWidth < 1024) {
+          newRadius = 420;
+        } else {
+          newRadius = 550;
+        }
+        
+        const newPositions = {...positions};
+        QUESTIONS.forEach((q, i) => {
+          // Split questions to top and bottom sections to avoid overlapping with terminal
+          const isTopSection = i < QUESTIONS.length / 2;
+          
+          // Base angle calculation
+          let angle;
+          if (isTopSection) {
+            // Top half - spread from -45 to -135 degrees (converted to radians)
+            angle = (-45 - (i / (QUESTIONS.length / 2)) * 90) * (Math.PI / 180);
+          } else {
+            // Bottom half - spread from 45 to 135 degrees (converted to radians)
+            const bottomIndex = i - Math.floor(QUESTIONS.length / 2);
+            angle = (45 + (bottomIndex / (QUESTIONS.length - Math.floor(QUESTIONS.length / 2))) * 90) * (Math.PI / 180);
+          }
+          
+          const baseX = Math.sin(angle) * newRadius;
+          const baseY = Math.cos(angle) * newRadius;
+          
+          newPositions[q.id] = {
+            top: `calc(50% + ${baseY}px)`,
+            left: `calc(50% + ${baseX}px)`,
+            rotate: positions[q.id]?.rotate || '0deg',
+          };
+        });
+        
+        setRandomPositions(newPositions);
+      };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, [isMobile]);
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-start py-10 min-h-screen">
+        <div className="text-center space-y-3 mb-8 z-10 px-4">
+          <h1 className="text-4xl font-bold mb-2">
+            <span className="text-terminal-green">🧠 </span>
+            AI WHISPERERS
+          </h1>
+          <p className="text-lg max-w-xl mx-auto opacity-90">
+            Helping humans talk to machines — and each other
+          </p>
+        </div>
+
+        {/* Mobile: Questions List */}
+        <div className="w-full px-4 mb-10">
+          <div className="terminal-box p-3 mb-4">
+            <p className="text-sm text-terminal-gray mb-2">$ ls questions/</p>
+            <div className="space-y-2">
+              {QUESTIONS.map((q) => (
+                <div 
+                  key={q.id}
+                  className={`px-3 py-2 rounded border border-terminal-green border-opacity-40 cursor-pointer transition-colors duration-200 
+                             ${activeQuestionId === q.id ? 'bg-terminal-green bg-opacity-20' : 'bg-black bg-opacity-40'}`}
+                  onClick={() => handleMobileQuestionClick(q.id)}
+                >
+                  <div className="font-mono text-sm">
+                    <span className="text-terminal-green opacity-80 mr-1">$</span>
+                    {q.question}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile: Terminal */}
+        <div ref={terminalRef} className="w-full px-4 pb-20">
+          <Terminal 
+            initialPrompt="$ ask_ai_whisperers --about"
+            questions={QUESTIONS}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div className="flex flex-col items-center justify-center py-20 min-h-[90vh] relative overflow-hidden">
       <div className="text-center space-y-5 mb-16 z-10">
@@ -183,14 +279,14 @@ export default function Home() {
       </div>
 
       <div className="w-full relative h-[600px] sm:h-[700px] md:h-[800px] lg:h-[900px]" ref={containerRef}>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-[85%] sm:max-w-[70%] md:max-w-[500px]">
+        <div ref={terminalRef} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-[85%] sm:max-w-[70%] md:max-w-[500px]">
           <Terminal 
             initialPrompt="$ ask_ai_whisperers --about" 
             questions={QUESTIONS} 
           />
         </div>
         
-        {/* Questions scattered around */}
+        {/* Questions scattered around - desktop only */}
         <div className="absolute inset-0 pointer-events-none w-full h-full">
           {QUESTIONS.map((q, i) => (
             <div 
