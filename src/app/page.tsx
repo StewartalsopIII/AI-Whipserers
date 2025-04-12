@@ -1,6 +1,8 @@
 'use client';
 
 import { Terminal, TerminalQuestion } from '@/components/ui/Terminal';
+import { NetworkVisualizer } from '@/components/ui/NetworkVisualizer';
+import { MatrixBackground } from '@/components/ui/MatrixBackground';
 import { useEffect, useState, useRef } from 'react';
 
 // Hook to detect if we're on mobile
@@ -99,6 +101,9 @@ export default function Home() {
   const terminalRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
+  
+  // Add to detect if on desktop
+  const isDesktop = !isMobile;
   
   // Function to scroll to terminal
   const scrollToTerminal = () => {
@@ -267,18 +272,29 @@ export default function Home() {
 
   // Desktop Layout
   return (
-    <div className="flex flex-col items-center justify-center py-20 min-h-[90vh] relative overflow-hidden">
-      <div className="text-center space-y-5 mb-16 z-10">
-        <h1 className="text-6xl font-bold mb-4">
+    <div className="flex flex-col items-center pt-6 pb-12 min-h-[90vh] relative overflow-hidden">
+      {/* Matrix Rain Background - desktop only */}
+      {isDesktop && <MatrixBackground />}
+      
+      <div className="text-center space-y-2 mb-4 z-10">
+        <h1 className="text-5xl font-bold mb-1">
           <span className="text-terminal-green">🧠 </span>
           AI WHISPERERS
         </h1>
-        <p className="text-xl max-w-2xl mx-auto opacity-90">
+        <p className="text-lg max-w-2xl mx-auto opacity-90">
           Helping humans talk to machines — and each other
         </p>
       </div>
 
-      <div className="w-full relative h-[600px] sm:h-[700px] md:h-[800px] lg:h-[900px]" ref={containerRef}>
+      <div className="w-full relative h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px]" ref={containerRef}>
+        {/* Network Visualizer - desktop only */}
+        {isDesktop && (
+          <NetworkVisualizer 
+            questionIds={QUESTIONS.map(q => q.id)}
+            activeQuestionId={activeQuestionId}
+          />
+        )}
+      
         <div ref={terminalRef} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-[85%] sm:max-w-[70%] md:max-w-[500px]">
           <Terminal 
             initialPrompt="$ ask_ai_whisperers --about" 
@@ -291,6 +307,7 @@ export default function Home() {
           {QUESTIONS.map((q, i) => (
             <div 
               key={q.id}
+              id={`question-${q.id}`}
               className="absolute transform transition-all duration-300 ease-in-out"
               style={{
                 top: randomPositions[q.id]?.top || '50%',
@@ -303,7 +320,7 @@ export default function Home() {
               <TerminalQuestion 
                 id={q.id}
                 question={q.question}
-                onClick={() => {}} // No-op, event handling is done in Terminal component
+                onClick={() => setActiveQuestionId(q.id === activeQuestionId ? null : q.id)}
               />
             </div>
           ))}

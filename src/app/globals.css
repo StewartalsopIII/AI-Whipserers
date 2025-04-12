@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 255, 0;
+  --foreground-rgb: 50, 255, 50; /* Brighter, more vibrant green for main text */
   --background-rgb: 18, 18, 18;
   --heading-rgb: 255, 255, 255;
 }
@@ -43,6 +43,57 @@ body::after {
   pointer-events: none;
 }
 
+/* Matrix rain animation - desktop only */
+@media (min-width: 769px) {
+  .matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+  
+  .matrix-column {
+    position: absolute;
+    width: 20px;
+    top: -100px;
+    opacity: 0.8;
+    animation: matrix-rain linear infinite;
+    color: rgba(0, 100, 0, 0.5); /* Darker green for background elements */
+    text-shadow: 0 0 5px rgba(0, 100, 0, 0.3);
+    font-family: monospace;
+    font-size: 14px;
+    text-align: center;
+    user-select: none;
+  }
+  
+  @keyframes matrix-rain {
+    0% {
+      transform: translateY(-100%);
+      opacity: 1;
+    }
+    85% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+  }
+  
+  /* Enhanced glow effects for connections */
+  .connection-glow {
+    filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.7));
+    transition: filter 0.3s ease;
+  }
+  
+  .connection-glow:hover {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 0, 1));
+  }
+}
+
 main {
   position: relative;
   z-index: 10;
@@ -59,17 +110,84 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.15);
   }
   
+  /* Enhanced terminal box for desktop */
+  @media (min-width: 769px) {
+    .terminal-box {
+      position: relative;
+      box-shadow: 
+        0 0 15px rgba(100, 255, 100, 0.4), /* Brighter shadow */
+        0 0 30px rgba(0, 255, 0, 0.2),
+        inset 0 0 15px rgba(0, 255, 0, 0.15);
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      border-color: rgba(100, 255, 100, 0.7); /* Brighter border */
+    }
+    
+    .terminal-box::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      z-index: -1;
+      background: linear-gradient(45deg, rgba(0, 255, 0, 0.1), transparent, rgba(0, 255, 0, 0.1));
+      border-radius: inherit;
+      animation: glowingBorder 3s linear infinite;
+    }
+    
+    @keyframes glowingBorder {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+  }
+  
   .terminal-prompt {
-    @apply text-terminal-green font-mono;
+    @apply font-mono;
+    color: rgb(80, 255, 80); /* Brighter green for terminal prompt */
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); /* Add glow */
   }
   
   .terminal-cursor {
     @apply inline-block w-2 h-4 bg-terminal-green ml-1 align-middle animate-blink;
   }
   
+  /* Enhanced terminal cursor for desktop */
+  @media (min-width: 769px) {
+    .terminal-cursor {
+      position: relative;
+      @apply animate-blink;
+    }
+    
+    .terminal-cursor::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: rgba(0, 255, 0, 0.3);
+      filter: blur(3px);
+      border-radius: 2px;
+      animation: cursorGlow 1s ease-in-out infinite alternate;
+    }
+    
+    @keyframes cursorGlow {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
+  }
+  
   .terminal-question {
-    @apply text-terminal-green hover:text-terminal-white cursor-pointer transition-all duration-300 font-mono;
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    @apply cursor-pointer transition-all duration-300 font-mono;
+    color: rgb(100, 255, 100); /* Brighter green for questions */
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+  }
+  
+  .terminal-question:hover {
+    color: rgb(180, 255, 180); /* Even brighter on hover */
+    text-shadow: 0 0 12px rgba(0, 255, 0, 0.7);
   }
   
   @media (max-width: 768px) {

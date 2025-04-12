@@ -175,6 +175,43 @@ The site includes several animations:
 - Fade-in animation for answers appearing in the terminal
 - Subtle hover effects on terminal questions
 - Transform effects when questions are interacted with
+- Matrix rain animation with falling Japanese characters
+- Beam effects that travel between questions when clicked
+- Pulsing nodes when beam animations reach targets
+
+### Network Visualizer
+
+The new NetworkVisualizer component (`/src/components/ui/NetworkVisualizer.tsx`) creates dynamic connections between elements:
+
+- Canvas-based animation system for optimal performance
+- Beam animation that travels from question to question when clicked
+- Visual feedback with glowing nodes and paths
+- Abstract user silhouettes connected to the network
+
+```tsx
+// Draw beam effect for question-to-question connections
+const dx = conn.end.x - conn.start.x;
+const dy = conn.end.y - conn.start.y;
+const distance = Math.sqrt(dx * dx + dy * dy);
+
+// Calculate beam positions
+const beamLength = distance * 0.15; // 15% of total length
+const beamPosition = conn.beamProgress * (distance + beamLength) - beamLength;
+
+// Only draw if the beam is visible on the line
+if (beamPosition > -beamLength && beamPosition < distance) {
+  // Beam rendering logic...
+}
+```
+
+### Matrix Background
+
+The MatrixBackground component (`/src/components/ui/MatrixBackground.tsx`) creates a Matrix-inspired falling character effect:
+
+- Dynamically creates columns of falling characters
+- Uses Japanese characters and binary digits
+- Optimizes animation speed and display for readability
+- Only renders on desktop devices to preserve performance
 
 ## Future Enhancements
 
@@ -182,5 +219,55 @@ Potential improvements for future versions:
 1. Add typing animation for terminal responses
 2. Implement terminal command history
 3. Add more interactive terminal commands
-4. Create animated transitions between questions
+4. Enhance the beam animation with particle effects
 5. Implement keyboard navigation for accessibility
+6. Add audio feedback for interactions
+7. Create a "screensaver mode" with more intense animations when idle
+8. Add more silhouettes and dynamic connection patterns
+9. Implement an "input mode" where users can type questions directly
+
+## Mobile and Desktop Implementation
+
+The site now features distinct implementations for mobile and desktop:
+
+### Mobile Implementation
+- Uses a vertical list of questions at the top of the page
+- Implements smooth scrolling to the terminal when a question is clicked
+- Highlights the active question in the list
+- Optimizes for touch interfaces and smaller screens
+
+### Desktop Implementation
+- Questions positioned in orbital arcs around the terminal
+- Full network visualization with beam effects
+- Matrix rain animation in the background
+- Enhanced visual effects and animations
+- Optimized for larger screens and pointer devices
+
+### Responsive Detection
+The site uses a custom hook to detect mobile devices and render the appropriate layout:
+
+```tsx
+// Hook to detect if we're on mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Set initial value
+    checkMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+};
+```
+
+This detection system allows for optimal experiences on both device types without performance compromise.

@@ -82,13 +82,20 @@ export function TerminalQuestion({ id, question, onClick }: { id: string; questi
     }
   };
   
+  // Check if we're on desktop using media query
+  const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches;
+  
   return (
     <div 
-      className="terminal-question cursor-pointer inline-block transform transition-all duration-300 
+      className={`terminal-question cursor-pointer inline-block transform transition-all duration-300 
                  hover:scale-105 hover:text-terminal-white bg-black bg-opacity-50 
                  px-3 py-2 rounded-sm border border-terminal-green border-opacity-40
-                 text-sm md:text-base whitespace-nowrap text-center"
+                 text-sm md:text-base whitespace-nowrap text-center
+                 ${isDesktop ? 'connection-glow' : ''}`}
       onClick={handleClick}
+      style={{
+        boxShadow: isDesktop ? '0 0 10px rgba(0, 255, 0, 0.3)' : 'none',
+      }}
     >
       <span className="text-terminal-green opacity-90 mr-1">$</span>
       {question}
